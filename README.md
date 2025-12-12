@@ -23,12 +23,11 @@ This script navigates LinkedIn Jobs, searches for positions, applies the **Easy 
 <ul>
   <li>Python 3.9+</li>
   <li>Playwright</li>
-  <li>python-dotenv (for environment variables)</li>
 </ul>
 
 Install dependencies using:
 
 ```bash
-pip install playwright python-dotenv
+pip install playwright
 python -m playwright install
 

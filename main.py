@@ -8,7 +8,7 @@ def main():
 
         context.add_cookies([{
             "name": "li_at",
-            "value": "your_li_at_linkedin_cookie_value",
+            "value": "AQEDAV2mEAwEKRViAAABmxHta1QAAAGbNfnvVE4Aqt7DEOFOLwUtEeo0G-6YJni-beRtOL558zhKN7f5PoNZ8QaHVocMLuIRTfN2YypJrPOJU7P-zE_WEhYDbSf0i7s6jHQ_zgpyADz71CEwtLaGwk7Q",
             "domain": "www.linkedin.com",
             "path": "/",
             "secure": True,
@@ -19,7 +19,7 @@ def main():
         # Go to linkedin
         page.goto("https://www.linkedin.com/jobs/")
         # Go to the search bar and type java
-        page.get_by_placeholder("Describe the job you want").type("what_job_you_want_goes_here")
+        page.get_by_placeholder("Describe the job you want").type("java")
         page.keyboard.press("Enter")
         # Apply the easy apply filter
         page.locator("label:has-text('Easy Apply')").wait_for(state="visible")  # reveal the checkbox
@@ -55,7 +55,7 @@ def main():
                         if(page.locator("label[data-test-text-selectable-option__label='Yes']").count() > 0):
                             print("reached 3")
                             for j in range(0, page.locator("label[data-test-text-selectable-option__label='Yes']").count()):
-                                page.locator("label[data-test-text-selectable-option__label='Yes']").nth(j).click()
+                                page.locator("label[data-test-text-selectable-option__label='Yes']").nth(j).click(force=True)
                         #Check if the next button is next or review
                         if(page.get_by_label("Continue to next step").count() > 0):
                             print("reached 4")
@@ -64,7 +64,8 @@ def main():
                             print("reached 5")
                             page.get_by_label("Review your application").click()
                     #Now submit the application
-                    page.get_by_label("Submit application").click()
+                    if(page.get_by_label("Submit application").count() > 0):
+                        page.get_by_label("Submit application").click()
                     #Dismiss the your application was sent page
                     page.wait_for_timeout(1000)
                     page.locator("svg[data-test-icon='close-medium']").click()
