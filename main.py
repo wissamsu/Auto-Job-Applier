@@ -4,17 +4,7 @@ def main():
     with sync_playwright() as p: 
         context= p.chromium.launch_persistent_context(user_data_dir="profile",headless=False, slow_mo=800)
 
-        # context = browser.new_context()
-
-        # context.add_cookies([{
-        #     "name": "li_at",
-        #     "value": "AQEDAV2mEAwEKRViAAABmxHta1QAAAGbNfnvVE4Aqt7DEOFOLwUtEeo0G-6YJni-beRtOL558zhKN7f5PoNZ8QaHVocMLuIRTfN2YypJrPOJU7P-zE_WEhYDbSf0i7s6jHQ_zgpyADz71CEwtLaGwk7Q",
-        #     "domain": "www.linkedin.com",
-        #     "path": "/",
-        #     "secure": True,
-        #     "httpOnly": False
-        #     }
-        # ])
+        
         page = context.new_page()
         # Go to linkedin
         page.goto("https://www.linkedin.com/jobs/")
