@@ -1,20 +1,20 @@
-from playwright.sync_api import Locator, sync_playwright, expect
+from playwright.sync_api import Locator, sync_playwright
 
 def main():
     with sync_playwright() as p: 
-        browser= p.chromium.launch(headless=False, slow_mo=500)
+        context= p.chromium.launch_persistent_context(user_data_dir="profile",headless=False, slow_mo=800)
 
-        context = browser.new_context()
+        # context = browser.new_context()
 
-        context.add_cookies([{
-            "name": "li_at",
-            "value": "AQEDAV2mEAwEKRViAAABmxHta1QAAAGbNfnvVE4Aqt7DEOFOLwUtEeo0G-6YJni-beRtOL558zhKN7f5PoNZ8QaHVocMLuIRTfN2YypJrPOJU7P-zE_WEhYDbSf0i7s6jHQ_zgpyADz71CEwtLaGwk7Q",
-            "domain": "www.linkedin.com",
-            "path": "/",
-            "secure": True,
-            "httpOnly": False
-            }
-        ])
+        # context.add_cookies([{
+        #     "name": "li_at",
+        #     "value": "AQEDAV2mEAwEKRViAAABmxHta1QAAAGbNfnvVE4Aqt7DEOFOLwUtEeo0G-6YJni-beRtOL558zhKN7f5PoNZ8QaHVocMLuIRTfN2YypJrPOJU7P-zE_WEhYDbSf0i7s6jHQ_zgpyADz71CEwtLaGwk7Q",
+        #     "domain": "www.linkedin.com",
+        #     "path": "/",
+        #     "secure": True,
+        #     "httpOnly": False
+        #     }
+        # ])
         page = context.new_page()
         # Go to linkedin
         page.goto("https://www.linkedin.com/jobs/")
@@ -23,7 +23,7 @@ def main():
         page.keyboard.press("Enter")
         # Apply the easy apply filter
         page.locator("label:has-text('Easy Apply')").wait_for(state="visible")  # reveal the checkbox
-        page.locator("label:has-text('Easy Apply')").click()
+        page.locator("label:has-text('Easy Apply')").click(force=True)
         # Get the number of jobs
         JobsFound: Locator = page.locator("//*[@id='workspace']/div/div/div[1]/div/div[1]/div/div/div/div/div")
         print(JobsFound.count(), "jobs found")
@@ -31,16 +31,19 @@ def main():
             for i in range(0, JobsFound.count()):
                 page.wait_for_timeout(1000)
                 if(page.get_by_label("Easy Apply to this job").count() > 0 and page.get_by_label("Easy Apply to this job").is_visible()):
+                    page.get_by_label("Easy Apply to this job").click(force=True)
                     #Click easy apply button
-                    page.get_by_label("Easy Apply to this job").click()
+                    page.wait_for_timeout(1000)
+                    if(page.get_by_label("Continue to next step").count() > 0 or page.get_by_label("Continue to next step").is_visible()):
+                        print("reached 6")
+                        page.get_by_label("Continue to next step").click(force=True)
                     #Skip first step since its already filled in
-                    page.get_by_label("Continue to next step").click()
                     if(page.get_by_label("Continue to next step").count() > 0):
-                        page.get_by_label("Continue to next step").click()
+                        page.get_by_label("Continue to next step").click(force=True)
                     if(page.get_by_label("Review your application").count() > 0):
-                        page.get_by_label("Review your application").click()
+                        page.get_by_label("Review your application").click(force=True)
                     if(page.get_by_label("Submit application").count() > 0):
-                        page.get_by_label("Submit application").click()
+                        page.get_by_label("Submit application").click(force=True)
                     #Check for any textboxes that need to be filled
                     while(page.get_by_label("Continue to next step").count() > 0 or page.get_by_label("Review your application").count() > 0):
                         print("filling")
@@ -57,24 +60,28 @@ def main():
                             for j in range(0, page.locator("label[data-test-text-selectable-option__label='Yes']").count()):
                                 page.locator("label[data-test-text-selectable-option__label='Yes']").nth(j).click(force=True)
                         #Check if the next button is next or review
-                        if(page.get_by_label("Continue to next step").count() > 0):
-                            print("reached 4")
-                            page.get_by_label("Continue to next step").click()
                         if(page.get_by_label("Review your application").count() > 0):
                             print("reached 5")
-                            page.get_by_label("Review your application").click()
+                            page.get_by_label("Review your application").dblclick(force=True)
+                        if(page.get_by_label("Continue to next step").count() > 0):
+                            print("reached 4")
+                            page.get_by_label("Continue to next step").click(force=True)
+                        
                     #Now submit the application
                     if(page.get_by_label("Submit application").count() > 0):
-                        page.get_by_label("Submit application").click()
+                        page.get_by_label("Submit application").click(force=True)
                     #Dismiss the your application was sent page
                     page.wait_for_timeout(1000)
-                    page.locator("svg[data-test-icon='close-medium']").click()
+                    page.locator("svg[data-test-icon='close-medium']").click(force=True)
                 else:
                     print(f"You already applied to job number {i}")
-                    JobsFound.nth(i).click() 
+                    JobsFound.nth(i).click(force=True) 
             #Go to next page of jobs
-            if(page.locator("//*[@id='workspace']/div/div/div[1]/div/div[2]/button[2]").count() > 0):
-                page.locator("//*[@id='workspace']/div/div/div[1]/div/div[2]/button[2]").click()
+            if(page.locator("//*[@id='workspace']/div/div/div[1]/div/div[2]/button[2]/span/span").count() > 0):
+                print("Used first")
+                page.locator("//*[@id='workspace']/div/div/div[1]/div/div[2]/button[2]/span/span").click(force=True)
+                print("Used next button")
+                page.wait_for_timeout(5000)
             else:
                 break
 
@@ -83,3 +90,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
